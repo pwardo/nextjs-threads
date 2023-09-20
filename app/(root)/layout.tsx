@@ -6,6 +6,12 @@ import LeftSidebar from '@/components/shared/LeftSidebar';
 import RightSidebar from '@/components/shared/RightSidebar';
 import Bottombar from '@/components/shared/Bottombar';
 
+export const metadata = {
+  title: 'NextJS Threads',
+  description: 'Threads App built with NextJS 13.4, Tailwind CSS and MongoDB',
+};
+
+
 export default function RootLayout({
   children,
 }: {
