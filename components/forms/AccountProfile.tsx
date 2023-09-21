@@ -101,11 +101,11 @@ const AccountProfile = ({ user, btnTitle }: Props ) => {
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-3 w-full">
+            <FormItem className="flex flex-col w-full gap-3">
               <FormLabel className="text-base-semibold text-light-2">
-                Name  
+                Name
               </FormLabel>
-              <FormControl className="flex-1 text-base-semibold text-gray-200">
+              <FormControl>
                 <Input
                   type="text"
                   className="account-form_input no-focus"
@@ -119,11 +119,11 @@ const AccountProfile = ({ user, btnTitle }: Props ) => {
           control={form.control}
           name="username"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-3 w-full">
+            <FormItem className="flex flex-col w-full gap-3">
               <FormLabel className="text-base-semibold text-light-2">
-                Username  
+                Username
               </FormLabel>
-              <FormControl className="flex-1 text-base-semibold text-gray-200">
+              <FormControl>
                 <Input
                   type="text"
                   className="account-form_input no-focus"
@@ -137,11 +137,11 @@ const AccountProfile = ({ user, btnTitle }: Props ) => {
           control={form.control}
           name="bio"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-3 w-full">
+            <FormItem className="flex flex-col w-full gap-3">
               <FormLabel className="text-base-semibold text-light-2">
-                Bio  
+                Bio
               </FormLabel>
-              <FormControl className="flex-1 text-base-semibold text-gray-200">
+              <FormControl>
                 <Textarea
                   rows={10}
                   className="account-form_input no-focus"
@@ -151,7 +151,7 @@ const AccountProfile = ({ user, btnTitle }: Props ) => {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="bg-primary-500">Submit</Button>
       </form>
     </Form>
   )
