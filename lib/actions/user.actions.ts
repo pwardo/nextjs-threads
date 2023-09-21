@@ -46,3 +46,17 @@ export async function updateUser({
   }
 }
 
+export async function fetchUser(userId: string): Promise<any> {
+  try {
+    connectToDB();
+    return await User
+      .findOne({ id: userId })
+      // .populate({
+      //   path: "communities",
+      //   model: "Community",
+      // });
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user: ${error.message}`);
+  }
+}
+
