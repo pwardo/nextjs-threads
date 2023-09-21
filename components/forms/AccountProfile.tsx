@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from "@/components/ui/button";
 
 import { UserValidation } from '@/lib/validations/user';
@@ -91,6 +92,60 @@ const AccountProfile = ({ user, btnTitle }: Props ) => {
                   placeholder="Upload a photo"
                   className="account-form_image-input"
                   onChange={(e) => handleImage(e, field.onChange)}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-3 w-full">
+              <FormLabel className="text-base-semibold text-light-2">
+                Name  
+              </FormLabel>
+              <FormControl className="flex-1 text-base-semibold text-gray-200">
+                <Input
+                  type="text"
+                  className="account-form_input no-focus"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-3 w-full">
+              <FormLabel className="text-base-semibold text-light-2">
+                Username  
+              </FormLabel>
+              <FormControl className="flex-1 text-base-semibold text-gray-200">
+                <Input
+                  type="text"
+                  className="account-form_input no-focus"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-3 w-full">
+              <FormLabel className="text-base-semibold text-light-2">
+                Bio  
+              </FormLabel>
+              <FormControl className="flex-1 text-base-semibold text-gray-200">
+                <Textarea
+                  rows={10}
+                  className="account-form_input no-focus"
+                  {...field}
                 />
               </FormControl>
             </FormItem>
