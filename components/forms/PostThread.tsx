@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,35 +15,34 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from 'next/navigation';
 
 import { ThreadValidation } from '@/lib/validations/thread';
+import { createThread } from '@/lib/actions/thread.actions';
 
 interface Props {
-  user: {
-    id: string;
-    onjectId: string;
-    username: string;
-    name: string;
-    bio: string;
-    image: string;
-  };
-  btnTitle: string;
+  userId: string;
 }
 
-function PostThread({ userId }: { userId: string }) {  
+function PostThread({ userId }: Props) {  
   const router = useRouter();
   const pathname = usePathname();
   
-  const form = useForm({
+  const form = useForm<z.infer<typeof ThreadValidation>>({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
-      thread: '',
-      userId: userId,
-    }
+      thread: "",
+      accountId: userId,
+    },
   });
 
+  const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
+    await createThread({
+      content: values.thread,
+      author: userId,
+      community: null,
+      path: pathname,
+    });
 
-  const onSubmit = async (values: any) => {
-    // TODO: sumbit thread to database
-  }
+    router.push("/");
+  };
 
   return (
     <Form {...form}>
@@ -75,7 +73,7 @@ function PostThread({ userId }: { userId: string }) {
         </Button>
       </form>
     </Form>
-  )
+  );
 }
 
 export default PostThread;
