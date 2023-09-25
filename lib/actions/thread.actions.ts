@@ -20,8 +20,8 @@ export async function createThread({
 }: 
   Params
 ) {
-  connectToDB();
   try {
+    connectToDB();
     const createdThread = await Thread.create({
       content,
       author,
@@ -42,8 +42,8 @@ export async function createThread({
 }
 
 export async function fetchThreads(pageNumber = 1, pageSize = 20) {
-  connectToDB();
   try {
+    connectToDB();
     const skipAmount = (pageNumber - 1) * pageSize;
     const threadsQuery = Thread.find({
       parentId: { $in: [null, undefined] }
@@ -118,9 +118,8 @@ export async function fetchThreadById(threadId: string) {
 }
 
 export async function addCommentToThread(threadId: string, commentText: string, userId: string, path: string) {
-  connectToDB();
   try {
-
+    connectToDB();
     const originalThread = await Thread.findById(threadId);
     if(!originalThread) {
       throw new Error(`Thread not found`);
