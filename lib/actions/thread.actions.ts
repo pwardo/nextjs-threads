@@ -41,3 +41,43 @@ export async function createThread({
     throw new Error(`Failed to create thread: ${error.message}`);
   }
 }
+
+export async function fetchThreads(pageNumber = 1, pageSize = 20) {
+  try {
+    connectToDB();
+
+    const skipAmount = (pageNumber - 1) * pageSize;
+    const threadsQuery = Thread.find({
+      parentId: { $in: [null, undefined] }
+    })
+    .sort({ createdAt: "desc" })
+    .skip(skipAmount)
+    .limit(pageSize)
+    .populate({
+      path: "author",
+      model: User,
+      select: "_id id name image",
+    })
+    .populate({
+      path: "children",
+      populate: {
+        path: "author",
+        model: User,
+        select: "_id name parentId image",
+      },
+    });
+
+    const totalThreadsCount = await Thread.countDocuments({
+      parentId: { $in: [null, undefined] }
+    });
+
+    const threads = await threadsQuery.exec();
+
+    const isNextPageAvailable = totalThreadsCount > skipAmount + threads.length;
+
+    return { threads, isNextPageAvailable }
+
+  } catch (error) {
+    
+  }
+}
