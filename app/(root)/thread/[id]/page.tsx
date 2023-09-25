@@ -3,15 +3,16 @@ import { currentUser } from "@clerk/nextjs";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import { fetchThreadById } from "@/lib/actions/thread.actions";
+import Comment from "@/components/forms/Comment";
 
-const Page = async ({ params }: { params: { id: string }}) => {
-  if(!params.id) return null;
+async function page({ params }: { params: { id: string }}) {
+  if (!params.id) return null;
 
   const user = await currentUser();
-  if(!user) return null;
+  if (!user) return null;
 
   const userInfo = await fetchUser(user.id);
-  if (!userInfo?.onboarded) redirect('/onboarding');
+  if (!userInfo?.onboarded) redirect("/onboarding");
 
   const thread = await fetchThreadById(params.id);
 
@@ -21,7 +22,7 @@ const Page = async ({ params }: { params: { id: string }}) => {
         <ThreadCard
           id={thread._id}
           key={thread._id}
-          currentUserId={user?.id || ""}
+          currentUserId={user.id}
           parentId={thread.parentId}
           content={thread.content}
           author={thread.author}
@@ -30,10 +31,36 @@ const Page = async ({ params }: { params: { id: string }}) => {
           comments={thread.children}
         />
       </div>
-
-      
+  
+      <div className='mt-7'>
+        <Comment
+          threadId={params.id}
+          currentUserImage={userInfo.image}
+          currentUserId={JSON.stringify(userInfo._id)}
+        />
+      </div>
+  
+      <div className="mt-10">
+        {thread.children.map((childItem: any) => {
+          return (
+            <ThreadCard
+              id={childItem._id}
+              key={childItem._id}
+              currentUserId={user.id}
+              parentId={childItem.parentId}
+              content={childItem.content}
+              author={childItem.author}
+              community={childItem.community}
+              createdAt={childItem.createdAt}
+              comments={childItem.children}
+              isComment
+            />
+          );
+        
+        })}
+      </div>
     </section>
   );
 }
 
-export default Page;
+export default page;
