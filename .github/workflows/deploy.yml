@@ -36,9 +36,6 @@ jobs:
           echo UPLOADTHING_SECRET=${{ secrets.UPLOADTHING_SECRET }} >> .env
           echo UPLOADTHING_APP_ID=${{ secrets.UPLOADTHING_APP_ID }} >> .env
 
-      - name: Install And Build Our NextJS App
-        run: npm install && npm run build
-
       - name: Create zip deployment package
         run: zip -r ${{ env.DEPLOY_PACKAGE_NAME_FILE }} .
 
