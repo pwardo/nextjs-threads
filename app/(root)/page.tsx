@@ -16,6 +16,8 @@ export default async function Home() {
             <>
               {
                 response?.threads.map((thread) => (
+                  <>
+                  {console.log("Thread Data: ", thread.community)}
                   <ThreadCard
                     id={thread._id}
                     key={thread._id}
@@ -27,6 +29,7 @@ export default async function Home() {
                     createdAt={thread.createdAt}
                     comments={thread.children}
                   />
+                  </>
                 ))
               }
             </>

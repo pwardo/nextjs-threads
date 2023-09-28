@@ -5,6 +5,7 @@ import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import Thread from "../models/thread.model";
 import { FilterQuery, SortOrder } from "mongoose";
+import Community from "../models/community.model";
 
 interface Params {
   userId: string;
@@ -17,30 +18,29 @@ interface Params {
 
 export async function updateUser({
   userId,
-  username,
-  name,
   bio,
+  name,
+  path,
+  username,
   image,
-  path
 }: Params): Promise<void> {
 
   try {
     connectToDB();
     await User.findOneAndUpdate(
       { id: userId },
-      { 
+      {
         username: username.toLowerCase(),
         name,
         bio,
         image,
-        path,
         onboarded: true,
       },
-      { upsert: true } // upsert = update or insert if not found
+      { upsert: true }
     );
-  
-    if(path === '/profile/edit') {
-      revalidatePath(path)
+
+    if(path === "/profile/edit") {
+      revalidatePath(path);
     }
   } catch (error: any) {
     throw new Error(`Failed to create/update user: ${error.message}`);
@@ -52,10 +52,10 @@ export async function fetchUser(userId: string): Promise<any> {
     connectToDB();
     return await User
       .findOne({ id: userId })
-      // .populate({
-      //   path: "communities",
-      //   model: "Community",
-      // });
+      .populate({
+        path: "communities",
+        model: "Community",
+      });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
@@ -67,15 +67,22 @@ export async function fetchUserThreads(userId: string) {
     const threads = await User.findOne({id: userId}).populate({
       path: "threads",
       model: Thread,
-      populate: {
-        path: "children",
-        model: Thread,
-        populate: {
-          path: "author",
-          model: User,
-          select: "name image id",
-        }
-      }
+      populate: [
+        {
+          path: "community",
+          model: Community,
+          select: "name id image _id",
+        },
+        {
+          path: "children",
+          model: Thread,
+          populate: {
+            path: "author",
+            model: User,
+            select: "name image id",
+          },
+        },
+      ],
     });
 
     return threads;
@@ -106,14 +113,14 @@ export async function fetchUsers({
     const regex = new RegExp(searchString, "i");
 
     const query: FilterQuery<typeof User> = {
-      id: { $ne: userId }
-    }
+      id: { $ne: userId }, // Exclude the current user from the results.
+    };
 
-    if(searchString.trim() !== "") {
+    if (searchString.trim() !== "") {
       query.$or = [
         { username: { $regex: regex } },
         { name: { $regex: regex } },
-      ]
+      ];
     }
 
     const sortOptions = { createdAt: sortOrder };
@@ -125,7 +132,7 @@ export async function fetchUsers({
 
     const totalUsersCount = await User.countDocuments(query);
 
-    const users = await usersQuery;
+    const users = await usersQuery.exec();
 
     const isNext = totalUsersCount > skipAmount + users.length;
 
@@ -141,17 +148,18 @@ export async function getActivity(userId: string) {
     connectToDB();
 
     const userThreads = await Thread.find({
-      author: userId,
-    })
+      author: userId
+    });
 
-    // get all the child thread ids (replies) from the 'children
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
     const childThreadIds = userThreads.reduce((accumilator, userThread) => {
       return accumilator.concat(userThread.children);
     }, []);
 
-    const replies = await Thread.find({ 
+    // Find and return the child threads (replies) excluding the ones created by the same user
+    const replies = await Thread.find({
       _id: { $in: childThreadIds },
-      author: { $ne: userId },
+      author: { $ne: userId }, // Exclude threads authored by the same user
     }).populate({
       path: "author",
       model: User,
