@@ -81,7 +81,7 @@ export async function fetchCommunityThreads(id: string) {
         {
           path: "author",
           model: User,
-          select: "name image id", // Select the "name" and "_id" fields from the "User" model
+          select: "name image id",
         },
         {
           path: "children",
@@ -107,12 +107,12 @@ export async function fetchCommunities({
   searchString = "",
   pageNumber = 1,
   pageSize = 20,
-  sortBy = "desc",
+  sortOrder = "desc",
 }: {
   searchString?: string;
   pageNumber?: number;
   pageSize?: number;
-  sortBy?: SortOrder;
+  sortOrder?: SortOrder;
 }) {
   try {
     connectToDB();
@@ -135,7 +135,7 @@ export async function fetchCommunities({
     }
 
     // Define the sort options for the fetched communities based on createdAt field and provided sort order.
-    const sortOptions = { createdAt: sortBy };
+    const sortOptions = { createdAt: sortOrder };
 
     // Create a query to fetch the communities based on the search and sort criteria.
     const communitiesQuery = Community.find(query)
