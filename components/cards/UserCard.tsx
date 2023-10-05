@@ -11,21 +11,34 @@ interface Props {
   userType: string
 }
 
+/**
+ * Renders a user card component that displays information about a user.
+ * @param id - The unique identifier of the user.
+ * @param name - The name of the user.
+ * @param username - The username of the user.
+ * @param imgUrl - The URL of the user's avatar image.
+ * @param userType - The type of the user (e.g., "regular", "admin").
+ * @returns The rendered user card component.
+ */
 const UserCard = ({
   id,
   name,
   username,
   imgUrl,
   userType
-} : Props
-) => {
+}: Props) => {
   const router = useRouter();
+
+  const handleButtonClick = () => {
+    router.push(`/profile/${id}`);
+  };
+  
   return (
-    <article className="user-card">
-      <div className="user-card_avatar">
+    <article className="user-card" data-testid="user-card">
+      <div className="user-card_avatar" data-testid="user-card_avatar">
         <Image
           src={imgUrl}
-          alt="logo"
+          alt="User Avatar"
           width={48}
           height={48}
           className="rounded-full"
@@ -37,12 +50,11 @@ const UserCard = ({
         </div>
       </div>
 
-      <Button className="user-card_btn" onClick={() => router.push(`/profile/${id}`)}>
+      <Button className="user-card_btn" onClick={handleButtonClick} data-testid="user-card_btn">
         View Profile
       </Button>
-
     </article>
-  )
-}
+  );
+};
 
 export default UserCard;
