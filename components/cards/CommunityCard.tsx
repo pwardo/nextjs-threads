@@ -3,17 +3,33 @@ import Link from "next/link";
 
 import { Button } from "../ui/button";
 
-interface Props {
+interface CommunityCardProps {
   id: string;
   name: string;
   username: string;
   imgUrl: string;
   bio: string;
   members: {
+    id: string;
     image: string;
   }[];
 }
 
+
+/**
+ * Renders a card displaying information about a community.
+ * 
+ * @component
+ * 
+ * @param {string} id - The ID of the community.
+ * @param {string} name - The name of the community.
+ * @param {string} username - The username of the community.
+ * @param {string} imgUrl - The URL of the community's profile image.
+ * @param {string} bio - The bio of the community.
+ * @param {Array<{image: string}>} members - An array of objects representing the members of the community. Each object should have an `image` property containing the URL of the member's profile image.
+ * 
+ * @returns {JSX.Element} - The rendered card component.
+ */
 function CommunityCard({
   id,
   name,
@@ -21,16 +37,14 @@ function CommunityCard({
   imgUrl,
   bio,
   members,
-}: 
-  Props
-) {
+}: CommunityCardProps) {
   return (
     <article className='community-card'>
       <div className='flex flex-wrap items-center gap-3'>
         <Link href={`/communities/${id}`} className='relative h-12 w-12'>
           <Image
             src={imgUrl}
-            alt='community_logo'
+            alt={`${name} community_logo`}
             fill
             className='rounded-full object-cover'
           />
@@ -59,7 +73,7 @@ function CommunityCard({
               <Image
                 key={index}
                 src={member.image}
-                alt={`user_${index}`}
+                alt={`Profile picture of member with id ${member.id}`}
                 width={28}
                 height={28}
                 className={`${
