@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import classnames from "classnames";
 import { formatDateString } from "@/lib/utils";
 
 interface Props {
@@ -26,6 +27,21 @@ interface Props {
   isComment?: boolean;
 }
 
+/**
+ * Renders a card representing a thread.
+ *
+ * @param {string} id - The ID of the thread.
+ * @param {string} currentUserId - The ID of the current user.
+ * @param {string | null} parentId - The ID of the parent thread, or null if it is a top-level thread.
+ * @param {string} content - The content of the thread.
+ * @param {object} author - An object containing the ID, name, and image of the author of the thread.
+ * @param {object | null} community - An object containing the ID, name, and image of the community the thread belongs to, or null if it doesn't belong to any community.
+ * @param {string} createdAt - The creation date of the thread in ISO 8601 format.
+ * @param {array} comments - An array of objects representing the comments on the thread, each containing the image of the comment author.
+ * @param {boolean} isComment - A flag indicating whether the thread is a comment.
+ * @returns {React.Component} - The rendered thread card as a React component.
+ */
+
 const ThreadCard = ({
   id,
   currentUserId,
@@ -38,11 +54,14 @@ const ThreadCard = ({
   isComment,
 }: Props) => {
 
+  const formattedDateString = formatDateString(createdAt);
+  const cardClass = isComment ? `px-0 xs:px-7` : `bg-dark-2 p-7`;
+
   return (
-    <article className={
-      `flex w-full flex-col rounded-xl bg-dark-2 p-7
-      ${isComment ? "px-0 xs:px-7" : "bg-dark-2 p-7" }`
-    }>
+    <article data-testid="thread-card" className={classnames(
+      "flex w-full flex-col rounded-xl bg-dark-2 p-7",
+      cardClass,
+    )}>
       <div className="flex items-start justify-between">
         <div className="flex w-full flex-1 flex-row gap-4">
           <div className="flex flex-col items-center">
@@ -54,7 +73,7 @@ const ThreadCard = ({
                 className="cursor-pointer rounded-full"
               />
             </Link>
-            <div className="thread-card_bar"/>
+            <div className="thread-card_bar" />
           </div>
 
           <div className='flex w-full flex-col'>
@@ -110,9 +129,8 @@ const ThreadCard = ({
       {!isComment && community && (
         <Link href={`/communities/${community.id}`} className="mt-5 flex items-center">
           <p className="text-subtle-medium text-gray-1">
-            {formatDateString(createdAt)} - {community.name} Community
+            {formattedDateString} - {community.name} Community
           </p>
-
           <Image
             src={community.image}
             alt={community.name}
@@ -122,9 +140,8 @@ const ThreadCard = ({
           />
         </Link>
       )}
-
     </article>
-  )
-}
+  );
+};
 
 export default ThreadCard;

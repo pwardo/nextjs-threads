@@ -53,8 +53,6 @@ describe('ThreadCard', () => {
       </AppRouterContextProviderMock>
     );
 
-    const formattedDateString = formatDateString(mockProps.createdAt);
-
     expect(screen.getByText(mockProps.content)).toBeInTheDocument();
     expect(screen.getByText(mockProps.author.name)).toBeInTheDocument();
   });
@@ -79,24 +77,52 @@ describe('ThreadCard', () => {
     expect(screen.getByText(formattedDateString + ' - ' + mockPropsWithCommunity.community.name + ' Community')).toBeInTheDocument();
   });
 
-  it('should render the thread card with a comment prop', () => {
-    const mockPropsWithCommunity = { 
+  it('should render the thread card with a comment prop as true', () => {
+    const mockPropsWithIsComment = { 
       ...mockProps,
-      community: {
-        id: "789",
-        name: "Tech Community",
-        image: "/assets/community.jpg",
-      },
       isComment: true,
     }
-    
+
     render(
       <AppRouterContextProviderMock router={{ push }}>
         <ThreadCard {...mockProps} />
       </AppRouterContextProviderMock>
     );
 
-    expect(screen.getByText(mockPropsWithCommunity.content)).toBeInTheDocument();
-    expect(screen.getByText(mockPropsWithCommunity.author.name)).toBeInTheDocument();
+    expect(screen.getByText(mockPropsWithIsComment.content)).toBeInTheDocument();
+    expect(screen.getByText(mockPropsWithIsComment.author.name)).toBeInTheDocument();
   });
+
+  it('should render the thread card with empty comments array', () => {
+    const mockPropsWithEmptyComments = { 
+      ...mockProps,
+      comments: [],
+    }
+
+    render(
+      <AppRouterContextProviderMock router={{ push }}>
+        <ThreadCard {...mockPropsWithEmptyComments} />
+      </AppRouterContextProviderMock>
+    );
+
+    expect(screen.getByText(mockPropsWithEmptyComments.content)).toBeInTheDocument();
+    expect(screen.getByText(mockPropsWithEmptyComments.author.name)).toBeInTheDocument();
+   });
+
+  it('should render the thread card with no community prop', () => {
+    const mockPropsWithNoCommunity = { 
+      ...mockProps,
+      community: null,
+    }
+
+    render(
+      <AppRouterContextProviderMock router={{ push }}>
+        <ThreadCard {...mockPropsWithNoCommunity} />
+      </AppRouterContextProviderMock>
+    );
+
+    expect(screen.getByText(mockPropsWithNoCommunity.content)).toBeInTheDocument();
+    expect(screen.getByText(mockPropsWithNoCommunity.author.name)).toBeInTheDocument();
+   });
+
 });
