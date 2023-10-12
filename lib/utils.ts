@@ -29,3 +29,10 @@ export function formatDateString(dateString: string) {
 
   return `${time} - ${formattedDate}`;
 }
+
+export function isLinkActive(currentPath: string, linkRoute: string): boolean {
+  return (
+    (currentPath.includes(linkRoute) && linkRoute.length > 1) ||
+    currentPath === linkRoute
+  );
+}

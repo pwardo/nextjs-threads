@@ -4,8 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { SignOutButton, SignedIn, useAuth } from "@clerk/nextjs";
+import { isLinkActive } from "@/lib/utils";
 
-
+/**
+ * Renders a left sidebar navigation bar with navigation links based on the current route.
+ *
+ * @returns The rendered left sidebar navigation bar component.
+ */
 function LeftSidebar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -15,14 +20,8 @@ function LeftSidebar() {
     <section className="custom-scrollbar leftsidebar">
       <div className="flex w-full flex-1 flex-col gap-6 px-6">
           {sidebarLinks.map((link) => {
-
-            const isActive = (
-              pathname.includes(link.route) &&
-              link.route.length > 1
-            ) || pathname === link.route;
-
+            const isActive = isLinkActive(pathname, link.route);
             if (link.route === "/profile") link.route = `${link.route}/${userId}`;
-
             return (
               <Link 
                 href={link.route}
