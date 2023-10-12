@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
 
-interface Props {
+export interface UserCardProps {
   id: string,
   name: string,
   username: string,
@@ -26,13 +26,14 @@ const UserCard = ({
   username,
   imgUrl,
   userType
-}: Props) => {
+}: UserCardProps) => {
+
   const router = useRouter();
 
   const handleButtonClick = () => {
     router.push(`/profile/${id}`);
   };
-  
+
   return (
     <article className="user-card" data-testid="user-card">
       <div className="user-card_avatar" data-testid="user-card_avatar">

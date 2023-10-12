@@ -3,7 +3,7 @@ import Image from "next/image";
 import classnames from "classnames";
 import { formatDateString } from "@/lib/utils";
 
-interface Props {
+export interface ThreadCardProps {
   id: string;
   currentUserId: string;
   parentId: string | null;
@@ -52,7 +52,7 @@ const ThreadCard = ({
   createdAt,
   comments,
   isComment,
-}: Props) => {
+}: ThreadCardProps) => {
 
   const formattedDateString = formatDateString(createdAt);
   const cardClass = isComment ? `px-0 xs:px-7` : `bg-dark-2 p-7`;

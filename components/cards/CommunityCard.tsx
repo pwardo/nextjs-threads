@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Button } from "../ui/button";
 
-interface CommunityCardProps {
+export interface CommunityCardProps {
   id: string;
   name: string;
   username: string;
@@ -14,7 +14,6 @@ interface CommunityCardProps {
     image: string;
   }[];
 }
-
 
 /**
  * Renders a card displaying information about a community.

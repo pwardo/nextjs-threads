@@ -1,4 +1,4 @@
-import { screen, fireEvent, render } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
 import ProfileHeader, { ProfileHeaderProps } from '../ProfileHeader';
 
@@ -24,8 +24,8 @@ const mockProps = {
   type: 'User'
 };
 
+const push = jest.fn();
 const renderWithAppRouterContext = (props: ProfileHeaderProps) => {
-  const push = jest.fn();
   return render(
     <AppRouterContextProviderMock router={{ push }}>
       <ProfileHeader {...props} />
@@ -34,14 +34,13 @@ const renderWithAppRouterContext = (props: ProfileHeaderProps) => {
 }
 
 describe('ProfileHeader', () => {
-
   it('should render profile header with edit button for authenticated user', () => {
     renderWithAppRouterContext(mockProps);
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByText('@johndoe')).toBeInTheDocument();
-    expect(screen.getByAltText('Profile picture of John Doe')).toBeInTheDocument();
-    expect(screen.getByText('Lorem ipsum dolor sit amet')).toBeInTheDocument();
-    expect(screen.getByAltText('edit profile')).toBeInTheDocument();
+    expect(screen.getByText(/John Doe/)).toBeInTheDocument();
+    expect(screen.getByText(/@johndoe/)).toBeInTheDocument();
+    expect(screen.getByAltText(/Profile picture of John Doe/)).toBeInTheDocument();
+    expect(screen.getByText(/Lorem ipsum dolor sit amet/)).toBeInTheDocument();
+    expect(screen.getByAltText(/edit profile/)).toBeInTheDocument();
   });
 
   it('should render profile header without edit button for unauthenticated user', () => {

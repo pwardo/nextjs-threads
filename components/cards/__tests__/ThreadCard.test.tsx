@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
 import { formatDateString } from "@/lib/utils";
-import ThreadCard from '../ThreadCard';
+import ThreadCard, { ThreadCardProps } from '../ThreadCard';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -11,12 +11,10 @@ jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: any) => {
-    return <img {...props} />
+    const propsCopy = props?.fill ? {...props, fill: "true" } : props; // Fix for the warning: Received `true` for a non-boolean attribute `fill`.
+    return <img {...propsCopy} />
   },
 }));
-
-// Required for AppRouterContextProviderMock
-const push = jest.fn();
 
 const mockProps = {
   id: "1",
@@ -45,14 +43,18 @@ const mockProps = {
   isComment: false,
 }
 
+const push = jest.fn();
+const renderWithAppRouterContext = (props: ThreadCardProps) => {
+  return render(
+    <AppRouterContextProviderMock router={{ push }}>
+      <ThreadCard {...props} />
+    </AppRouterContextProviderMock>
+  );
+}
+
 describe('ThreadCard', () => {
   it('should render the thread card with all required props', () => {
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <ThreadCard {...mockProps} />
-      </AppRouterContextProviderMock>
-    );
-
+    renderWithAppRouterContext(mockProps);
     expect(screen.getByText(mockProps.content)).toBeInTheDocument();
     expect(screen.getByText(mockProps.author.name)).toBeInTheDocument();
   });
@@ -66,63 +68,27 @@ describe('ThreadCard', () => {
         image: "/assets/community.jpg",
       }
     }
-
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <ThreadCard {...mockPropsWithCommunity} />
-      </AppRouterContextProviderMock>
-    );
-
+    renderWithAppRouterContext(mockPropsWithCommunity);
     const formattedDateString = formatDateString(mockPropsWithCommunity.createdAt);
     expect(screen.getByText(formattedDateString + ' - ' + mockPropsWithCommunity.community.name + ' Community')).toBeInTheDocument();
   });
 
   it('should render the thread card with a comment prop as true', () => {
-    const mockPropsWithIsComment = { 
-      ...mockProps,
-      isComment: true,
-    }
-
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <ThreadCard {...mockProps} />
-      </AppRouterContextProviderMock>
-    );
-
-    expect(screen.getByText(mockPropsWithIsComment.content)).toBeInTheDocument();
-    expect(screen.getByText(mockPropsWithIsComment.author.name)).toBeInTheDocument();
+    renderWithAppRouterContext({...mockProps, isComment: true });
+    expect(screen.getByText(mockProps.content)).toBeInTheDocument();
+    expect(screen.getByText(mockProps.author.name)).toBeInTheDocument();
   });
 
   it('should render the thread card with empty comments array', () => {
-    const mockPropsWithEmptyComments = { 
-      ...mockProps,
-      comments: [],
-    }
-
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <ThreadCard {...mockPropsWithEmptyComments} />
-      </AppRouterContextProviderMock>
-    );
-
-    expect(screen.getByText(mockPropsWithEmptyComments.content)).toBeInTheDocument();
-    expect(screen.getByText(mockPropsWithEmptyComments.author.name)).toBeInTheDocument();
+    renderWithAppRouterContext({...mockProps, comments: []});
+    expect(screen.getByText(mockProps.content)).toBeInTheDocument();
+    expect(screen.getByText(mockProps.author.name)).toBeInTheDocument();
    });
 
   it('should render the thread card with no community prop', () => {
-    const mockPropsWithNoCommunity = { 
-      ...mockProps,
-      community: null,
-    }
-
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <ThreadCard {...mockPropsWithNoCommunity} />
-      </AppRouterContextProviderMock>
-    );
-
-    expect(screen.getByText(mockPropsWithNoCommunity.content)).toBeInTheDocument();
-    expect(screen.getByText(mockPropsWithNoCommunity.author.name)).toBeInTheDocument();
+    renderWithAppRouterContext({...mockProps, community: null});
+    expect(screen.getByText(mockProps.content)).toBeInTheDocument();
+    expect(screen.getByText(mockProps.author.name)).toBeInTheDocument();
    });
 
 });

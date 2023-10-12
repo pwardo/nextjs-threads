@@ -1,7 +1,6 @@
-
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
-import UserCard from '../UserCard';
+import UserCard, { UserCardProps } from '../UserCard';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 
@@ -10,12 +9,10 @@ jest.mock('next/router', () => jest.requireActual('next-router-mock'));
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: any) => {
-    return <img {...props} />
+    const propsCopy = props?.fill ? {...props, fill: "true" } : props; // Fix for the warning: Received `true` for a non-boolean attribute `fill`.
+    return <img {...propsCopy} />
   },
 }));
-
-// Required for AppRouterContextProviderMock
-const push = jest.fn();
 
 const mockProps = {
   id: "1",
@@ -25,14 +22,18 @@ const mockProps = {
   userType: "User",
 }
 
-describe('UserCard', () => {
+const push = jest.fn();
+const renderWithAppRouterContext = (props: UserCardProps) => {
+  return render(
+    <AppRouterContextProviderMock router={{ push }}>
+      <UserCard {...props} />
+    </AppRouterContextProviderMock>
+  );
+}
 
+describe('UserCard', () => {
   beforeEach(() => {
-    render(
-      <AppRouterContextProviderMock router={{ push }}>
-        <UserCard {...mockProps} />
-      </AppRouterContextProviderMock>
-    );
+    renderWithAppRouterContext(mockProps);
   });
 
   it('should render user card with correct name, username, and avatar image', () => {

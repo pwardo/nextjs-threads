@@ -3,14 +3,30 @@ import Image from "next/image";
 import { OrganizationSwitcher, SignOutButton, SignedIn } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
+const organizationSwitcherAppearance = {
+  baseTheme: dark,
+  elements: {
+    organizationSwitcherTrigger: "py-2 px-4",
+  },
+};
+
+/**
+ * Renders the top navigation bar of a website.
+ * 
+ * @returns {JSX.Element} The rendered topbar component.
+ */
 function Topbar() {
   return (
     <nav className="topbar">
       <Link href="/" className="flex items-center gap-4">
-        <Image src="/assets/logo.svg" alt="logo" width={28} height={28} />
+        <Image
+          src="/assets/logo.svg"
+          alt="Threads logo"
+          width={28}
+          height={28}
+        />
         <p className="text-heading3-bold text-light-1 max-xs:hidden">Threads</p>
       </Link>
-
       <div className='flex items-center gap-1'>
         <div className="block md:hidden">
           <SignedIn>
@@ -26,14 +42,8 @@ function Topbar() {
             </SignOutButton>
           </SignedIn>
         </div>
-
         <OrganizationSwitcher
-          appearance={{
-            baseTheme: dark,
-            elements: {
-              organizationSwitcherTrigger: "py-2 px-4",
-            },
-          }}
+          appearance={organizationSwitcherAppearance}
         />
       </div>
     </nav>
