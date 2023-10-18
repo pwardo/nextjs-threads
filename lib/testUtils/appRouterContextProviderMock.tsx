@@ -1,7 +1,6 @@
 // This solution is from
 // https://github.com/vercel/next.js/discussions/48937#discussioncomment-6395245
 // Thank you yoshiomiyamae
-
 import {
   AppRouterContext,
   AppRouterInstance,

@@ -1,5 +1,5 @@
 import { screen, render } from '@testing-library/react';
-import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
+import { AppRouterContextProviderMock } from '@/lib/testUtils/appRouterContextProviderMock';
 import ProfileHeader, { ProfileHeaderProps } from '../ProfileHeader';
 
 jest.mock('next/navigation', () => ({

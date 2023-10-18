@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
+import { AppRouterContextProviderMock } from '@/lib/testUtils/appRouterContextProviderMock';
 import UserCard, { UserCardProps } from '../UserCard';
 
 jest.mock('next/router', () => jest.requireActual('next-router-mock'));

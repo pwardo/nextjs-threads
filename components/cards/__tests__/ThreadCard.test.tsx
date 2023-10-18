@@ -1,6 +1,6 @@
 
 import { render, screen } from '@testing-library/react';
-import { AppRouterContextProviderMock } from '@/lib/testUtils/app-router-context-provider-mock';
+import { AppRouterContextProviderMock } from '@/lib/testUtils/appRouterContextProviderMock';
 import { formatDateString } from "@/lib/utils";
 import ThreadCard, { ThreadCardProps } from '../ThreadCard';
 
