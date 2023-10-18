@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import User from "../models/user.model";
-import { connectToDB } from "../mongoose";
-import Thread from "../models/thread.model";
+import { connectToDB } from "@/lib/mongoose";
 import { FilterQuery, SortOrder } from "mongoose";
-import Community from "../models/community.model";
+import User from "@/lib/models/user.model";
+import Thread from "@/lib/models/thread.model";
+import Community from "@/lib/models/community.model";
 
 interface Params {
   userId: string;
@@ -61,10 +61,26 @@ export async function fetchUser(userId: string): Promise<any> {
   }
 }
 
+/**
+ * Fetches a user's threads from a database.
+ * 
+ * @param userId - The ID of the user whose threads need to be fetched.
+ * @returns The user object with the `threads` field populated with additional information from related models.
+ * @throws If there is an error while fetching the user's threads.
+ * 
+ * @example
+ * const userId = "12345";
+ * const userThreads = await fetchUserThreads(userId);
+ * console.log(userThreads);
+ * 
+ * The code above fetches the threads of the user with the ID "12345" and logs the populated user object, including the threads and their related information.
+ */
 export async function fetchUserThreads(userId: string) {
   try {
     connectToDB();
-    const threads = await User.findOne({id: userId}).populate({
+    const threads = await User.findOne({
+      id: userId
+    }).populate({
       path: "threads",
       model: Thread,
       populate: [
