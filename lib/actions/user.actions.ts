@@ -7,7 +7,7 @@ import User from "@/lib/models/user.model";
 import Thread from "@/lib/models/thread.model";
 import Community from "@/lib/models/community.model";
 
-interface Params {
+interface UpdateUserParams {
   userId: string;
   username: string;
   name: string;
@@ -16,6 +16,18 @@ interface Params {
   path: string;
 }
 
+/**
+ * Updates a user's information in a MongoDB database.
+ * If the user does not exist, a new document is created.
+ * If the path parameter is "/profile/edit", the revalidatePath function is called.
+ * @param userId - The ID of the user to be updated.
+ * @param bio - The new bio of the user.
+ * @param name - The new name of the user.
+ * @param path - The path of the current page.
+ * @param username - The new username of the user.
+ * @param image - The new image URL of the user.
+ * @throws Error if failed to create/update user.
+ */
 export async function updateUser({
   userId,
   bio,
@@ -23,8 +35,7 @@ export async function updateUser({
   path,
   username,
   image,
-}: Params): Promise<void> {
-
+}: UpdateUserParams): Promise<void> {
   try {
     connectToDB();
     await User.findOneAndUpdate(
@@ -38,8 +49,7 @@ export async function updateUser({
       },
       { upsert: true }
     );
-
-    if(path === "/profile/edit") {
+    if (path === "/profile/edit") {
       revalidatePath(path);
     }
   } catch (error: any) {
@@ -47,16 +57,28 @@ export async function updateUser({
   }
 }
 
+/**
+ * Fetches a user from a MongoDB database.
+ * 
+ * @param userId - The ID of the user to fetch.
+ * @returns A Promise that resolves to the fetched user object from the database.
+ * @throws If the user is not found with the specified ID.
+ */
 export async function fetchUser(userId: string): Promise<any> {
   try {
     connectToDB();
-    return await User
+    const user = await User
       .findOne({ id: userId })
       .populate({
         path: "communities",
         model: "Community",
       });
+    if (!user) {
+      throw new Error(`User not found with id: ${userId}`);
+    }
+    return user;
   } catch (error: any) {
+    console.log("Message::: ", error.message);
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }
@@ -108,6 +130,18 @@ export async function fetchUserThreads(userId: string) {
   }
 }
 
+/**
+ * Fetches a list of users from a database based on certain criteria.
+ * 
+ * @param {Object} options - The options for fetching users.
+ * @param {string} options.userId - The ID of the current user.
+ * @param {string} [options.searchString=""] - A search string to filter the users by username or name.
+ * @param {number} [options.pageNumber=1] - The page number of the results.
+ * @param {number} [options.pageSize=20] - The number of users to fetch per page.
+ * @param {SortOrder} [options.sortOrder="desc"] - The sort order of the results (either "asc" or "desc").
+ * @returns {Promise<Object>} - An object containing the fetched users and a boolean value indicating whether there are more users to fetch.
+ * @throws {Error} - If there is an error fetching the users.
+ */
 export async function fetchUsers({
   userId,
   searchString = "",
@@ -126,13 +160,12 @@ export async function fetchUsers({
 
     const skipAmount = (pageNumber - 1) * pageSize;
 
-    const regex = new RegExp(searchString, "i");
-
     const query: FilterQuery<typeof User> = {
       id: { $ne: userId }, // Exclude the current user from the results.
     };
-
+    
     if (searchString.trim() !== "") {
+      const regex = new RegExp(searchString, "i");
       query.$or = [
         { username: { $regex: regex } },
         { name: { $regex: regex } },
@@ -146,9 +179,10 @@ export async function fetchUsers({
       .skip(skipAmount)
       .limit(pageSize);
 
-    const totalUsersCount = await User.countDocuments(query);
-
-    const users = await usersQuery.exec();
+    const [totalUsersCount, users] = await Promise.all([
+      User.countDocuments(query),
+      usersQuery.exec(),
+    ]);
 
     const isNext = totalUsersCount > skipAmount + users.length;
 
@@ -159,6 +193,14 @@ export async function fetchUsers({
   }
 }
 
+/**
+ * Retrieves the replies of a user's threads from a database.
+ * 
+ * @param {string} userId - The ID of the user whose activity is being fetched.
+ * @returns {Promise<Array<Object>>} - An array of thread objects representing the replies to the user's threads.
+ * Each reply object includes the author's name, image, and ID.
+ * @throws {Error} - If there is an error fetching the user's activity.
+ */
 export async function getActivity(userId: string) {
   try {
     connectToDB();
