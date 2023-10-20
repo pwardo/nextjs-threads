@@ -10,7 +10,6 @@ import User from "@/lib/models/user.model";
 import { fetchUser, fetchUserThreads, fetchUsers, getActivity, updateUser } from "../user.actions";
 import Thread from '@/lib/models/thread.model';
 import Community from '@/lib/models/community.model';
-import mongoose from 'mongoose';
 
 describe('user.actions', () => {
   beforeAll(async () => {
@@ -27,18 +26,6 @@ describe('user.actions', () => {
   
   describe('fetchUserThreads', () => {
     let user: any;
-
-    const mockThread01 = {
-      content: 'Thread 1 Content',
-      communityId: null,
-      path: "/create-thread",
-    }
-    
-    const mockThread02 = {
-      content: 'Thread 2 Content',
-      communityId: null,
-      path: "/create-thread",
-    }
 
     beforeEach(async () => {
       user = await User.create({
@@ -65,11 +52,15 @@ describe('user.actions', () => {
     it('should return a correct object when the user ID is valid and threads field is populated', async () => {
       await Promise.all([
         Thread.create({
-          ...mockThread01,
+          content: 'Thread 1 Content',
+          communityId: null,
+          path: "/create-thread",
           author: user._id,
         }),
         Thread.create({
-          ...mockThread02,
+          content: 'Thread 2 Content',
+          communityId: null,
+          path: "/create-thread",
           author: user._id,
         })
       ]).then((values) => {

@@ -6,7 +6,7 @@ import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import Community from "../models/community.model";
 
-interface Params {
+export interface IThread {
   content: string,
   author: string,
   communityId: string | null,
@@ -18,8 +18,8 @@ export async function createThread({
   author,
   communityId,
   path
-}: 
-  Params
+}:
+  IThread
 ) {
   try {
     connectToDB();
@@ -57,13 +57,22 @@ export async function createThread({
   }
 }
 
+/**
+ * Fetches a list of threads from the database.
+ * 
+ * @param pageNumber - The page number of the threads to fetch. Defaults to 1.
+ * @param pageSize - The number of threads to fetch per page. Defaults to 20.
+ * @returns An object containing the fetched threads and a flag indicating if there is a next page available.
+ * @throws If there is an error while fetching the threads.
+ */
 export async function fetchThreads(pageNumber = 1, pageSize = 20) {
   try {
     connectToDB();
     const skipAmount = (pageNumber - 1) * pageSize;
-    const threadsQuery = Thread.find({
+    const parentIdFilter = {
       parentId: { $in: [null, undefined] }
-    })
+    }
+    const threadsQuery = Thread.find(parentIdFilter)
     .sort({ createdAt: "desc" })
     .skip(skipAmount)
     .limit(pageSize)
@@ -84,11 +93,10 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
       },
     });
 
-    const totalThreadsCount = await Thread.countDocuments({
-      parentId: { $in: [null, undefined] },
-    });
-
-    const threads = await threadsQuery.exec();
+    const [totalThreadsCount, threads] = await Promise.all([
+      Thread.countDocuments(parentIdFilter),
+      threadsQuery.exec(),
+    ]);
 
     const isNextPageAvailable = totalThreadsCount > skipAmount + threads.length;
 

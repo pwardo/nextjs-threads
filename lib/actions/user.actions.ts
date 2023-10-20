@@ -7,7 +7,7 @@ import User from "@/lib/models/user.model";
 import Thread from "@/lib/models/thread.model";
 import Community from "@/lib/models/community.model";
 
-interface UpdateUserParams {
+interface IUpdateUser {
   userId: string;
   username: string;
   name: string;
@@ -35,7 +35,9 @@ export async function updateUser({
   path,
   username,
   image,
-}: UpdateUserParams): Promise<void> {
+}: 
+  IUpdateUser
+): Promise<void> {
   try {
     connectToDB();
     await User.findOneAndUpdate(
