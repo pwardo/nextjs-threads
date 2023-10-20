@@ -1,6 +1,6 @@
-import { fetchUserThreads } from "@/lib/actions/user.actions";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import ThreadCard from "../cards/ThreadCard";
+import { fetchUserThreads } from "@/lib/actions/user.actions";
 import { fetchCommunityThreads } from "@/lib/actions/community.actions";
 
 export interface ThreadsTabProps {
@@ -25,7 +25,6 @@ const ThreadsTab = async ({
   accountType
 }: ThreadsTabProps) => {
 
-  const router = useRouter();
   let result: any
   if(accountType === "Community") {
     result = await fetchCommunityThreads(accountId);
@@ -33,7 +32,7 @@ const ThreadsTab = async ({
     result = await fetchUserThreads(currentUserId);
   }
 
-  if(!result) router.push("/");
+  if(!result) redirect("/");
 
   return (
     <section className='mt-9 flex flex-col gap-10'>

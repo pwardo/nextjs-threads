@@ -78,7 +78,6 @@ export async function fetchUser(userId: string): Promise<any> {
     }
     return user;
   } catch (error: any) {
-    console.log("Message::: ", error.message);
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }
@@ -213,7 +212,7 @@ export async function getActivity(userId: string) {
     const childThreadIds = userThreads.reduce((accumilator, userThread) => {
       return accumilator.concat(userThread.children);
     }, []);
-
+    
     // Find and return the child threads (replies) excluding the ones created by the same user
     const replies = await Thread.find({
       _id: { $in: childThreadIds },
@@ -222,8 +221,8 @@ export async function getActivity(userId: string) {
       path: "author",
       model: User,
       select: "name image _id",
-    });
-
+    }).lean(); // https://mongoosejs.com/docs/tutorials/lean.html#when-to-use-lean to fix error: Cannot read properties of undefined (reading 'wasPopulated')
+  
     return replies;
 
   } catch (error: any) {

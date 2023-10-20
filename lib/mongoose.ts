@@ -9,7 +9,7 @@ export const connectToDB = async () => {
     throw new Error('MONGODB_URL not set');
   }
 
-  if(isConnected) return console.log('already connected');
+  if(isConnected) return;
 
   try {
     await mongoose.connect(
@@ -17,7 +17,6 @@ export const connectToDB = async () => {
         dbName: 'NextJS-Threads',
     });
     isConnected = true;
-    console.log('connected to db');
   } catch (error) {
     console.log('error connecting to db', error);
   }

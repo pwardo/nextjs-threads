@@ -1,20 +1,21 @@
 import { currentUser } from "@clerk/nextjs";
-
 import UserCard from "../cards/UserCard";
-
 import { fetchCommunities } from "@/lib/actions/community.actions";
 import { fetchUsers } from "@/lib/actions/user.actions";
 
+/**
+ * Renders a right sidebar section with suggested communities and similar users.
+ * 
+ * @returns {JSX.Element} The rendered right sidebar section.
+ */
 async function RightSidebar() {
   const user = await currentUser();
   if (!user) return null;
 
-  const similarMinds = await fetchUsers({
-    userId: user.id,
-    pageSize: 4,
-  });
-
-  const suggestedCOmmunities = await fetchCommunities({ pageSize: 4 });
+  const [similarMinds, suggestedCommunities] = await Promise.all([
+    fetchUsers({ userId: user.id, pageSize: 4 }),
+    fetchCommunities({ pageSize: 4 }),
+  ]);
 
   return (
     <section className='custom-scrollbar rightsidebar'>
@@ -24,9 +25,9 @@ async function RightSidebar() {
         </h3>
 
         <div className='mt-7 flex w-[350px] flex-col gap-9'>
-          {suggestedCOmmunities.communities.length > 0 ? (
+          {suggestedCommunities.communities.length > 0 ? (
             <>
-              {suggestedCOmmunities.communities.map((community) => (
+              {suggestedCommunities.communities.map((community) => (
                 <UserCard
                   key={community.id}
                   id={community.id}

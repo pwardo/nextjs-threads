@@ -37,7 +37,7 @@ const Comment = ({ threadId, currentUserImage, currentUserId }: Props) => {
     await addCommentToThread(threadId, values.thread, currentUserId, pathname);
     form.reset();
   };
-  
+
   return (
     <Form {...form}>
     <form 
