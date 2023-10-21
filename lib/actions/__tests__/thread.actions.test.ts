@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import Thread from "@/lib/models/thread.model";
-import { fetchThreads, IThread } from "../thread.actions";
+import { fetchThreadById, fetchThreads } from "../thread.actions";
 import User from "@/lib/models/user.model";
 import { connect, disconnect, dropData } from "@/lib/testUtils/mongoMemoryServerHelper";
 import { faker } from '@faker-js/faker';
@@ -73,7 +73,6 @@ describe('thread.actions', () => {
           })
         )
       }
-      // console.log("threadsArray", threadsArray.length);
       await Promise.all(threadsArray).then((values) => {
         User.findByIdAndUpdate(user._id, {
           $push: {
@@ -98,7 +97,6 @@ describe('thread.actions', () => {
       expect(result.isNextPageAvailable).toBe(false);
     });
 
-    // Should handle a single thread and return the correct isNextPageAvailable flag
     it('should handle a single thread and return the correct isNextPageAvailable flag', async () => {
       await Thread.create({
         content: 'Thread 1 Content',
@@ -109,6 +107,84 @@ describe('thread.actions', () => {
       const result = await fetchThreads();
       expect(result.threads.length).toBe(1);
       expect(result.isNextPageAvailable).toBe(false);
+    });
+  });
+
+  describe('fetchThreadById', () => {
+    let user01: any;
+    let user02: any;
+    let thread01: any;
+    let thread02: any;
+
+    beforeEach(async () => {
+      user01 = await User.create({
+        id: '11111',
+        name: 'some-name-11111',
+        username: 'some-username-11111',
+        bio: 'Some bio this is',
+        profile_photo: '/profile-picture',
+        onboarded: true,
+        communities: []
+      });
+      user02 = await User.create({
+        id: '22222',
+        name: 'some-name-22222',
+        username: 'some-username-22222',
+        bio: 'Some bio this is',
+        profile_photo: '/profile-picture',
+        onboarded: true,
+        communities: []
+      });
+      thread01 = await Thread.create({
+        content: 'Thread 1 Content',
+        communityId: null,
+        path: "/create-thread",
+        author: user01._id,
+      });
+      thread02 = await Thread.create({
+        content: 'Reply to Thread 1',
+        communityId: null,
+        path: "/create-thread",
+        author: user02._id,
+        parentId: thread01._id
+      });
+      thread01.children.push(thread02._id);
+      await thread01.save();
+      await User.findByIdAndUpdate(user02._id, {
+        $push: {
+          threads: thread02._id
+        },
+      });
+    });
+    
+    it('should fetch a thread by its ID from the database', async () => {
+      const result = await fetchThreadById(thread01);
+      expect(result._id).toEqual(thread01._id);
+    });
+    
+    it('should populate the author field of the thread object with additional information from the related User model', async () => {
+      const result = await fetchThreadById(thread01);
+      expect(result._id).toEqual(thread01._id);
+      expect(result.content).toEqual(thread01.content);
+      expect(result.author._id).toEqual(user01._id);
+      expect(result.author.id).toEqual(user01.id);
+      expect(result.author.name).toEqual(user01.name);
+    });
+
+    it('should populate the children field of the thread object with additional information from the related Thread model', async () => {
+      const result = await fetchThreadById(thread01);
+      expect(result._id).toEqual(thread01._id);
+      expect(result.children[0]._id).toEqual(thread02._id);
+      expect(result.children[0].content).toEqual(thread02.content);
+      expect(result.children[0].parentId).toBe(thread02.parentId);
+    });
+
+    it('should populate the author field within children of the thread object with additional information from the related User model', async () => {
+      const result = await fetchThreadById(thread01);
+      expect(result._id).toEqual(thread01._id);
+      expect(result.children[0].author._id).toEqual(user02._id);
+      expect(result.children[0].author.id).toEqual(user02.id);
+      expect(result.children[0].author.name).toEqual(user02.name);
     });
   });
 });

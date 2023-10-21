@@ -107,6 +107,15 @@ export async function fetchThreads(pageNumber = 1, pageSize = 20) {
   }
 }
 
+/**
+ * Fetches a thread by its ID from a database.
+ * Populates the author, community, and children fields of the thread object with additional information from related models.
+ * The populated fields include the _id, id, name, and image properties of the related models.
+ * 
+ * @param threadId - The ID of the thread to fetch.
+ * @returns The fetched thread object with populated fields.
+ * @throws Error if failed to fetch the thread.
+ */
 export async function fetchThreadById(threadId: string) {
   try {
     connectToDB();
@@ -140,10 +149,9 @@ export async function fetchThreadById(threadId: string) {
             },
           },
         ],
-      })
-      .exec();
+      }).exec();
 
-    return thread;
+      return thread;
 
   } catch (error: any) {
     throw new Error(`Failed to fetch thread: ${error.message}`);
@@ -156,7 +164,7 @@ export async function addCommentToThread(
   userId: string,
   path: string
 ) {
-  
+
   try {
     connectToDB();
     const originalThread = await Thread.findById(threadId);
