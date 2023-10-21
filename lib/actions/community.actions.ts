@@ -1,13 +1,22 @@
 "use server";
-
 import { FilterQuery, SortOrder } from "mongoose";
-
 import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
-
 import { connectToDB } from "../mongoose";
 
+/**
+ * Creates a new community in a MongoDB database.
+ * 
+ * @param id - The ID of the community.
+ * @param name - The name of the community.
+ * @param username - The username of the community.
+ * @param image - The image URL of the community.
+ * @param bio - The bio of the community.
+ * @param createdById - The ID of the user who created the community.
+ * @returns The created community object.
+ * @throws If the user with the provided createdById is not found.
+ */
 export async function createCommunity(
   id: string,
   name: string,
