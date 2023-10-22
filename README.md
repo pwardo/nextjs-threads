@@ -8,10 +8,18 @@ This is an app built by following JavaScript Mastery tutorials to learn NextJS (
 
 To run on production server:
 
-1. npm run build
-2. pm2 start npm --name "NextJS-Threads" -- start
+- npm run build
+- pm2 start npm --name "NextJS-Threads" -- start
 
 Useful pm2 commands
 
 - pm2 status
 - pm2 logs
+
+To run tests
+
+- npm t
+
+To get test coverage stats
+
+- npm t --coverage
